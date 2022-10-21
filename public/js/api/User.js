@@ -4,13 +4,16 @@
  * Имеет свойство URL, равное '/user'.
  * */
  class User {
-  static URL = '/user';
+  static get URL() {
+    return '/user';
+  }
+
   /**
    * Устанавливает текущего пользователя в
    * локальном хранилище.
    * */
   static setCurrent(user) {
-    localStorage.user = JSON.stringify(user);
+    localStorage.setItem('user', JSON.stringify(user));
   }
 
   /**
@@ -18,7 +21,7 @@
    * пользователе из локального хранилища.
    * */
   static unsetCurrent() {
-    delete localStorage.user;
+    localStorage.removeItem('user');
   }
 
   /**
@@ -26,7 +29,11 @@
    * из локального хранилища
    * */
   static current() {
-    return JSON.parse(localStorage.getItem('user'))
+    try {
+      return JSON.parse(localStorage.getItem('user'));
+    } catch (e) {
+      callback(e);
+    }
   }
 
   /**
@@ -34,20 +41,19 @@
    * авторизованном пользователе.
    * */
   static fetch(callback) {
-     return createRequest({
-            url: this.URL + '/current',
-            data: {},
-            method: 'GET',
-            callback: (err, response) => {
-                if (response && response.user) {
-                  this.setCurrent(response.user);
-                } 
-                else {
-                  this.unsetCurrent();
-                }
-                callback(err, response);
-            }
-        });
+    createRequest({
+      url: this.URL + '/current',
+      responseType: 'json',
+      method: 'GET',
+      callback: (_, response) => {
+        if (response?.user) {
+          User.setCurrent(response.user);
+        } else {
+          User.unsetCurrent();
+        }
+        callback();
+      }
+    });
   }
 
   /**
@@ -59,13 +65,16 @@
   static login(data, callback) {
     createRequest({
       url: this.URL + '/login',
+      data: data,
+      responseType: 'json',
       method: 'POST',
-      data,
-      callback: (err, response) => {
-        if (response && response.user) {
-          this.setCurrent(response.user);
+      callback: (error, response) => {
+        if (error) {
+          callback(error);
+        } else {
+          User.setCurrent(response.user);
+          callback();
         }
-        callback(err, response);
       }
     });
   }
@@ -77,17 +86,20 @@
    * User.setCurrent.
    * */
   static register(data, callback) {
-    return createRequest({
-            url: this.URL + '/register',
-            data: {},
-            method: 'POST',
-            callback: (err, response) => {
-                if (response.success) {
-                    this.setCurrent(response.user);
-                }
-                callback(err, response);
-            }
-        });
+    createRequest({
+      url: this.URL + '/register',
+      data: data,
+      responseType: 'json',
+      method: 'POST',
+      callback: (error, response) => {
+        if (error) {
+          callback(error);
+        } else {
+          User.setCurrent(response.user);
+          callback();
+        }
+      }
+    });
   }
 
   /**
@@ -95,16 +107,19 @@
    * выхода необходимо вызвать метод User.unsetCurrent
    * */
   static logout(data, callback) {
-    return createRequest({
-            url: this.URL + '/logout',
-            data,
-            method: 'POST',
-            callback: (err, response) => {
-                if (response.success) {
-                    this.unsetCurrent(response.user);
-                }
-                callback(err, response);
-            }
+    createRequest({
+      url: this.URL + '/logout',
+      data: data,
+      responseType: 'json',
+      method: 'POST',
+      callback: (error) => {
+        if (error) {
+          callback(error);
+        } else {
+          User.unsetCurrent();
+          callback();
+        }
+      }
     });
   }
 }

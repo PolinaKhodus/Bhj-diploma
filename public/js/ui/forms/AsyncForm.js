@@ -14,12 +14,11 @@
    * */
   constructor(element) {
     if (!element) {
-      throw new Error('Ошибка! element не может быть пустым');
-    } 
-    else {
-      this.element = element;
-      this.registerEvents();
+      throw new Error('Параметр element класса AsyncForm не задан');
     }
+    this.element = element;
+
+    this.registerEvents();
   }
 
   /**
@@ -27,11 +26,12 @@
    * вызывает метод submit()
    * */
   registerEvents() {
-    this.element.addEventListener('submit', (e)=>{
-      e.preventDefault();
+    this.element.addEventListener('submit', (event) => {
+      event.preventDefault();
+
       this.submit();
-    })
-  } 
+    });
+  }
 
   /**
    * Преобразует данные формы в объект вида
@@ -41,18 +41,18 @@
    * }
    * */
   getData() {
-    formData = new FormData(element),
-    entries = formData.entries();
-    obj = {};
-    for (let item of entries) {
-      const key = item[0];
-      const value = item[1];
-      obj[key] = value;
+    const data = {};
+
+    const formData = new FormData(this.element).entries();
+
+    for (const item of formData) {
+      data[item[0]] = item[1];
     }
-    return obj
+
+    return data;
   }
 
-  onSubmit(options){
+  onSubmit(options) {
 
   }
 
@@ -61,6 +61,6 @@
    * данные, полученные из метода getData()
    * */
   submit() {
-    this.onSubmit(this.getData())
+    this.onSubmit(this.getData());
   }
 }

@@ -10,12 +10,16 @@
    * закрывает окно, в котором находится форма
    * */
   onSubmit(data) {
-  	User.login(data, (err, response) => {
-      if (err === null && response.success) {
-        App.setState('user-logged'); 
-        App.getModal('login').close(); 
+    const callback = (error) => {
+      if (error) {
+        handleError(error);
+      } else {
+        this.element.reset();
+        App.getModal('login').close();
+        App.setState('user-logged');
       }
-      this.element.reset(); 
-    });
+    };
+
+    User.login(data, callback);
   }
 }

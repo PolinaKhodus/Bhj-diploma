@@ -11,15 +11,15 @@
    * Если переданный элемент не существует,
    * необходимо выкинуть ошибку.
    * */
-  constructor( element ) {
+  constructor(element) {
     if (!element) {
-      throw new Error('Ошибка! element не может быть пустым');
-    } 
-    else {
-      this.element = element;
-      this.registerEvents();
+      throw new Error('Параметр element класса TransactionsWidget не задан');
     }
+    this.element = element;
+
+    this.registerEvents();
   }
+
   /**
    * Регистрирует обработчики нажатия на
    * кнопки «Новый доход» и «Новый расход».
@@ -27,18 +27,10 @@
    * экземпляра окна
    * */
   registerEvents() {
-    const btn_success = document.querySelector('.btn-success');
-    const btn_danger = document.querySelector('.btn-danger');
+    const income = this.element.querySelector('.btn-success');
+    const expense = this.element.querySelector('.btn-danger');
 
-
-    btn_success.addEventListener('click', (e)=>{
-      e.preventDefault();
-      App.getModal('modal-new-income').open();
-    })
-
-    btn_danger.addEventListener('click', (e)=>{
-      e.preventDefault();
-      App.getModal('modal-new-expence').open();
-    })
+    income.onclick = () => App.getModal('newIncome').open();
+    expense.onclick = () => App.getModal('newExpense').open();
   }
 }

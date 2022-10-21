@@ -9,12 +9,17 @@
    * и сбрасывает форму
    * */
   onSubmit(data) {
-  	Account.create(data, (err, response) => {
-      if (err === null && response.success) {
-        App.update(); 
-        App.getModal('modal').close(); 
+    const callback = (error) => {
+      if (error) {
+        handleError(error);
+      } else {
+        this.element.reset();
+        App.getModal('createAccount').close();
+        App.getWidget("accounts").update();
+        App.updateForms();
       }
-      this.element.reset(); 
-    });
+    }
+
+    Account.create(data, callback);
   }
 }

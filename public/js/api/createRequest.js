@@ -1,48 +1,67 @@
-/**
- * Основная функция для совершения запросов
- * на сервер.
- * */
- const createRequest = (options = {}) => {
-    const func = function () {},
-     {
-         method = 'GET',
-         callback = func,
-         responseType = 'json',
-         data = {}
-     } = options;
-
- const xhr = new XMLHttpRequest();
- const formData = new FormData();
- 
-
- 
- if (options.method === 'GET') {
-     options.url += `?`;
-     for (let key in options.data) {
-         options.url += `${key}=${options.data[key]}&`;
-     }
- } 
- else {
-     for (let key in options.data) {
-         formData.append(key, options.data[key]);
-     }
- }
-
-
-
-
- try {
-     xhr.open(options.method, options.url);
-     xhr.send(formData);
- } 
- catch (err) {
-     callback(err);
- }
- 
- xhr.addEventListener('readystatechange', () => {
-     if (xhr.readyState === xhr.DONE & xhr.status === 200) {
-         const response = JSON.parse(xhr.responseText);
-         options.callback(null, response);
-     }
- });
-};
+const handleError = (error) => {
+    if (App.state !== 'init' && Object.keys(error).length) {
+      let content = 'Сервер сообщил об ошибке: ';
+  
+      if (typeof error === 'object') {
+        content += Object.values(error).join(' ');
+      } else {
+        content += error;
+      }
+  
+      if (/[^.]$/.test(content)) {
+        content += '.';
+      }
+  
+      console.error(content);
+    }
+  }
+  
+  /**
+   * Основная функция для совершения запросов
+   * на сервер.
+   * */
+  const createRequest = (options) => {
+    if (!options) {
+      throw new Error('Параметр options функции createRequest не задан');
+    }
+  
+    let {url, headers, data, responseType, method, callback} = options;
+    const xhr = new XMLHttpRequest();
+  
+    try {
+      xhr.open(method, url);
+      xhr.responseType = responseType;
+      xhr.withCredentials = true;
+  
+      if (headers) {
+        for (const [key, value] of Object.entries(headers)) {
+          xhr.setRequestHeader(key, value);
+        }
+      }
+  
+      xhr.onloadend = () => {
+        if (String(xhr.status).startsWith('2')) {
+          callback(xhr.response?.error, xhr.response);
+        } else {
+          let content = 'Сервер не принял запрос. ';
+          content += `Ошибка ${xhr.status}: ${xhr.statusText}.`;
+          console.error(content);
+        }
+      }
+  
+      if (data === undefined) {
+        xhr.send();
+      } else {
+        const formData = new FormData();
+  
+        for (const [key, value] of Object.entries(data)) {
+          formData.append(key, value);
+        }
+  
+        xhr.send(formData);
+      }
+    }
+    catch (e) {
+      console.error(e);
+    }
+  };

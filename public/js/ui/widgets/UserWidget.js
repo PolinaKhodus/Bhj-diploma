@@ -11,9 +11,9 @@
    * Если переданный элемент не существует,
    * необходимо выкинуть ошибку.
    * */
-  constructor(element){
-    if(!element){
-      throw new Error('Ошибка!');
+  constructor(element) {
+    if (!element) {
+      throw new Error('Параметр element класса UserWidget не задан');
     }
     this.element = element;
   }
@@ -25,7 +25,12 @@
    * в элемент .user-name устанавливает имя
    * авторизованного пользователя
    * */
-  update(){
-    this.element.querySelector('.user-name').textContent = this.element.User.current();
+  update() {
+    const name = User.current().name;
+
+    if (name) {
+      const nameBox = this.element.querySelector('.user-name');
+      nameBox.textContent = name;
+    }
   }
 }

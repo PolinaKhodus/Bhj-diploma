@@ -2,51 +2,25 @@
  * Класс Entity - базовый для взаимодействия с сервером.
  * Имеет свойство URL, равно пустой строке.
  * */
-class Entity {
-  /**
-   * Запрашивает с сервера список данных.
-   * Это могут быть счета или доходы/расходы
-   * (в зависимости от того, что наследуется от Entity)
-   * */
-  static list(data, callback){
-
-  }
-
-  /**
-   * Создаёт счёт или доход/расход с помощью запроса
-   * на сервер. (в зависимости от того,
-   * что наследуется от Entity)
-   * */
-  static create(data, callback) {
-
-  }
-
-  /**
-   * Удаляет информацию о счёте или доходе/расходе
-   * (в зависимости от того, что наследуется от Entity)
-   * */
-  static remove(data, callback ) {
-
-  }
-}
-/**
- * Класс Entity - базовый для взаимодействия с сервером.
- * Имеет свойство URL, равно пустой строке.
- * */
  class Entity {
-  static URL = '';
+  static get URL() {
+    return '';
+  }
+
   /**
    * Запрашивает с сервера список данных.
    * Это могут быть счета или доходы/расходы
    * (в зависимости от того, что наследуется от Entity)
    * */
-  static list(data, callback){
-    return createRequest({
-            method: 'GET',
-            url: this.URL,
-            data,
-            callback: callback
-        });
+   static list(data, callback) {
+    createRequest({
+      /*url: this.URL + `/account_id=${data}`, - Исправил*/
+      url: this.URL,  
+      data: data, 
+      responseType: 'json',
+      method: 'GET',
+      callback: callback
+    });
   }
 
   /**
@@ -55,24 +29,26 @@ class Entity {
    * что наследуется от Entity)
    * */
   static create(data, callback) {
-    return createRequest({
-            url: this.URL,
-            method: 'PUT',
-            data,
-            callback: callback
-        });
+    createRequest({
+      url: this.URL,
+      data: data,
+      responseType: 'json',
+      method: 'PUT',
+      callback: callback
+    });
   }
 
   /**
    * Удаляет информацию о счёте или доходе/расходе
    * (в зависимости от того, что наследуется от Entity)
    * */
-  static remove(data, callback ) {
-    return createRequest({
-            url: this.URL,
-            method: 'DELETE',
-            data,
-            callback: callback
-        });
+  static remove(data, callback) {
+    createRequest({
+      url: this.URL,
+      data: data,
+      responseType: 'json',
+      method: 'DELETE',
+      callback: callback
+    });
   }
 }

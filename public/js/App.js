@@ -1,7 +1,7 @@
 /**
  * Класс App управляет всем приложением
  * */
-class App {
+ class App {
   /**
    * С вызова этого метода начинается работа всего приложения
    * Он производит перваоначальную настройку всех
@@ -12,14 +12,14 @@ class App {
     this.element = document.querySelector(".app");
     this.content = document.querySelector(".content-wrapper");
 
+    this.initUser();
+
     this.initPages();
     this.initForms();
     this.initModals();
     this.initWidgets();
 
     Sidebar.init();
-
-    this.initUser();
   }
 
   /**
